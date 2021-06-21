@@ -5,7 +5,7 @@ from gensim.models.wrappers import FastText
 app = Flask(__name__)
 
 # 載入模型 (大約要 1 分鐘)
-model = FastText.load_fasttext_format('/home/yongfu/fasttext-cc.zh.300.bin')
+model = FastText.load_fasttext_format('fasttext-cc.zh.300.bin')
 
 
 
