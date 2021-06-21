@@ -19,21 +19,21 @@ def welcome():
     # 整個 [無聊] 到 [不行]
     # {target: [無聊, 不行], candidates: [[嗨, 不行], [傻眼, 想死], ...]}
 
-    slot_number = len(a['target'])
+    slot_number = len(content['target'])
     score_list = []
 
-    for candidate in a['candidates']:
+    for candidate in content['candidates']:
         sim = 0
         for i, w in enumerate(candidate):
     #         print(i)
     #         print(w)
             # sim += similarity(a['target'][i], w)
-            sim += model.wv.similarity(a['target'][i], w)
+            sim += model.wv.similarity(content['target'][i], w)
         sim = sim / slot_number
         # print(sim)
         score_list.append(sim)
     
-    result = [{'score': _, 'candidate': x} for _, x in sorted(zip(score_list, a['candidates']), reverse=True)] 
+    result = [{'score': _, 'candidate': x} for _, x in sorted(zip(score_list, content['candidates']), reverse=True)] 
 
     return jsonify({'status': 'api working', 'sorted_candidates': result})
 
