@@ -1,4 +1,5 @@
 import os
+import sys
 from collections import Counter
 import pickle
 import re
@@ -12,7 +13,11 @@ from gensim.models.fasttext import load_facebook_model
 from nltk import FreqDist
 from nltk.util import ngrams
 
-from .helper import *
+sys.path.insert(0, '/usr/src')
+from app.helper import *
+
+print(sys.path)
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -20,6 +25,7 @@ CORS(app)
 
 # 載入模型 (大約要 1 分鐘)
 model = load_facebook_model('fasttext-cc.zh.300.bin')
+# model = None
 
 with open("womentalk_2019_pair.pickle", "rb") as f:
     corpus = pickle.load(f)
