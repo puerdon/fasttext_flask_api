@@ -31,6 +31,8 @@ with open("womentalk_2019_pair.pickle", "rb") as f:
     corpus = pickle.load(f)
 
 def _similarity(content):
+    print('content')
+    print(content)
     slot_number = len(content['target'])
     score_list = []
 
@@ -73,6 +75,8 @@ def query():
 def construction_extractor():
     query_pattern = request.args.get("pattern")
     parsed_query = parse_query(query_pattern)
+
+    print(parsed_query)
 
     target = []
     candidates = set()
