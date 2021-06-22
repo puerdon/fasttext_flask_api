@@ -1,2 +1,4 @@
 flask
 gensim
+flask-cors
+nltk
