@@ -41,7 +41,7 @@ def _similarity(content):
     
     result = [{'score': _, 'candidate': x} for _, x in sorted(zip(score_list, content['candidates']), reverse=True)] 
 
-    return jsonify({'status': 'success, 'sorted_candidates': result})
+    return jsonify({'status': 'success', 'sorted_candidates': result})
 
 
 @app.route('/similarity')
