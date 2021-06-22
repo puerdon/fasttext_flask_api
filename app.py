@@ -91,16 +91,20 @@ def construction_extractor():
     ptn = re.compile(ptn)
 
     for pair in corpus:
-        comment_findall = re.findall(ptn, pair['comment_content'])
-        recomment_findall = re.findall(ptn, pair['recomment_content'])
+        # comment_findall = re.findall(ptn, pair['comment_content'])
+        # recomment_findall = re.findall(ptn, pair['recomment_content'])
+        finditer = re.finditer(ptn, pair['comment_content'] + pair['recomment_content'])
 
-        if len(comment_findall) > 0:
-            for found_pair in comment_findall:
-                candidates.add(found_pair)
+        for found in finditer:
+            candidates.add(found.groups())
 
-        if len(comment_findall) > 0:
-            for found_pair in recomment_findall:
-                candidates.add(found_pair)
+        # if len(comment_findall) > 0:
+        #     for found_pair in comment_findall:
+        #         candidates.add(found_pair)
+
+        # if len(comment_findall) > 0:
+        #     for found_pair in recomment_findall:
+        #         candidates.add(found_pair)
 
 
     return _similarity({'target': target, 'candidates': list(candidates)})
