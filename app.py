@@ -47,7 +47,7 @@ def _similarity(content):
         # print(sim)
         score_list.append(sim)
     
-    result = [{'score': _, 'candidate': x} for _, x in sorted(zip(score_list, content['candidates']), reverse=True)] 
+    result = [{'score': round(_, 2), 'candidate': x} for _, x in sorted(zip(score_list, content['candidates']), reverse=True) if _ > 0] 
 
     return jsonify({'status': 'success', 'sorted_candidates': result})
 
@@ -108,7 +108,27 @@ def construction_extractor():
 
 
     return _similarity({'target': target, 'candidates': list(candidates)})
-        
+
+@app.route('/get_sentence')
+def get_sentence():
+    query_pattern = request.args.get("pattern")
+    window_size = request.args.get("window_size", 10)
+
+    results = []
+
+    for pair in corpus:
+
+        for m in re.finditer(query_pattern, pair['comment_content']):
+            left = max(0, m.start() - window_size)
+            right = min(len(pair['comment_content']), m.end())
+            results.append(pair['comment_content'][left:right])
+
+        for m in re.finditer(query_pattern, pair['recomment_content']):
+            left = max(0, m.start() - window_size)
+            right = min(len(pair['recomment_content']), m.end())
+            results.append(pair['recomment_content'][left:right])
+
+    return jsonify(results)
 
 #we define the route /
 @app.route('/')
