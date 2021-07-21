@@ -112,7 +112,7 @@ def construction_extractor():
 @app.route('/get_sentence')
 def get_sentence():
     query_pattern = request.args.get("pattern")
-    window_size = request.args.get("window_size", 10)
+    window_size = request.args.get("window_size", 10, type=int)
 
     results = []
 
@@ -120,12 +120,12 @@ def get_sentence():
 
         for m in re.finditer(query_pattern, pair['comment_content']):
             left = max(0, m.start() - window_size)
-            right = min(len(pair['comment_content']), m.end())
+            right = min(len(pair['comment_content']), m.end() + window_size)
             results.append(pair['comment_content'][left:right])
 
         for m in re.finditer(query_pattern, pair['recomment_content']):
             left = max(0, m.start() - window_size)
-            right = min(len(pair['recomment_content']), m.end())
+            right = min(len(pair['recomment_content']), m.end() + window_size)
             results.append(pair['recomment_content'][left:right])
 
     return jsonify(results)
