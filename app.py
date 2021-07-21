@@ -64,7 +64,7 @@ def _similarity(content, parsed_query):
         # print(sim)
         score_list.append(sim)
     
-    result = [{'score': round(_, 2), 'candidate': _join(x, parse_query)} for _, x in sorted(zip(score_list, content['candidates']), reverse=True) if _ > 0] 
+    result = [{'score': round(_, 2), 'candidate': _join(x, parsed_query)} for _, x in sorted(zip(score_list, content['candidates']), reverse=True) if _ > 0] 
 
     return jsonify({'status': 'success', 'sorted_candidates': result})
 
