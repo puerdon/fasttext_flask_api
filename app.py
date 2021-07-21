@@ -31,8 +31,8 @@ with open("womentalk_2019_pair.pickle", "rb") as f:
     corpus = pickle.load(f)
 
 def _join(candidates, parsed_query):
-    results = [];
-    var counter = 0;
+    results = []
+    counter = 0
 
     for word in parsed_query:
         if (word["type"] == 'constant'):
