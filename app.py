@@ -30,7 +30,24 @@ model = load_facebook_model('fasttext-cc.zh.300.bin')
 with open("womentalk_2019_pair.pickle", "rb") as f:
     corpus = pickle.load(f)
 
-def _similarity(content):
+def _join(candidates, parsed_query):
+    results = [];
+    var counter = 0;
+
+    for word in parsed_query:
+        if (word["type"] == 'constant'):
+            results.append(word)
+        elif (word["type"] == 'slot'):
+            results.append({
+                "type": "slot",
+                "word": candidates[counter]
+            })
+            counter = counter + 1;
+    
+    return results;
+
+
+def _similarity(content, parsed_query):
     print('content')
     print(content)
     slot_number = len(content['target'])
@@ -47,7 +64,7 @@ def _similarity(content):
         # print(sim)
         score_list.append(sim)
     
-    result = [{'score': round(_, 2), 'candidate': x} for _, x in sorted(zip(score_list, content['candidates']), reverse=True) if _ > 0] 
+    result = [{'score': round(_, 2), 'candidate': _join(x, parse_query)} for _, x in sorted(zip(score_list, content['candidates']), reverse=True) if _ > 0] 
 
     return jsonify({'status': 'success', 'sorted_candidates': result})
 
@@ -107,7 +124,8 @@ def construction_extractor():
         #         candidates.add(found_pair)
 
 
-    return _similarity({'target': target, 'candidates': list(candidates)})
+    return _similarity({'target': target, 'candidates': list(candidates)}, parsed_query)
+
 
 @app.route('/get_sentence')
 def get_sentence():
@@ -129,6 +147,7 @@ def get_sentence():
             results.append(pair['recomment_content'][left:right])
 
     return jsonify(results)
+
 
 #we define the route /
 @app.route('/')
