@@ -325,47 +325,40 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
             if match_first_turn or match_second_turn:
 
 
+
                 for matched_pattern in re_pattern.finditer(pair['comment_content']):
-                    
-                    # if 'comment_content_position' not in pair:
-                    #     pair['comment_content_position'] = list()
-                    
-                    # pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    # pair['comment_content_position'].append(pos)
-                    # list_of_turn_position_of_word.append(pos)
 
-                    # pos = get_pattern_position_in_an_utterance(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    # list_of_utterance_position_of_word.append(pos)
+                    if 'comment_content_turn_position' not in pair:
+                        pair['comment_content_turn_position'] = list()
 
+                    if 'comment_content_turn_position' not in pair:
+                        pair['comment_content_utterance_position'] = list()
 
                     pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_turn_position_of_word.append(pos) 
-                    pair['comment_content_turn_position'] = pos
+                    pair['comment_content_turn_position'].append(pos)
 
                     pos = get_pattern_position_in_an_utterance(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_utterance_position_of_word.append(pos)
-                    pair['comment_content_utterance_position'] = pos
+                    pair['comment_content_utterance_position'].append(pos)
 
 
                 for matched_pattern in re_pattern.finditer(pair['recomment_content']):
-                    
-                    # if 'recomment_content_position' not in pair:
-                    #     pair['recomment_content_position'] = list()
-                    
-                    # pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    # pair['recomment_content_position'].append(pos)
-                    # list_of_turn_position_of_word.append(pos)
 
-                    # pos = get_pattern_position_in_an_utterance(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    # list_of_utterance_position_of_word.append(pos)
+                    if 'recomment_content_turn_position' not in pair:
+                        pair['recomment_content_turn_position'] = list()
 
+                    if 'recomment_content_turn_position' not in pair:
+                        pair['recomment_content_utterance_position'] = list()
+                    
                     pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_turn_position_of_word.append(pos) 
-                    pair['recomment_content_turn_position'] = pos
+                    pair['recomment_content_turn_position'].append(pos)
 
                     pos = get_pattern_position_in_an_utterance(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_utterance_position_of_word.append(pos)
-                    pair['recomment_content_utterance_position'] = pos
+                    pair['recomment_content_utterance_position'].append(pos)
+
 
     
                 result['data'].append(pair)
@@ -382,17 +375,6 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
             if match_first_turn and match_second_turn:
 
                 for matched_pattern in re_pattern.finditer(pair['comment_content']):
-                    
-                    # if 'comment_content_position' not in pair:
-                    #     pair['comment_content_position'] = list()
-                    
-                    # pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    # pair['comment_content_position'].append(pos)
-                    # list_of_turn_position_of_word.append(pos)
-
-                    # pos = get_pattern_position_in_an_utterance(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    # list_of_utterance_position_of_word.append(pos)
-
                     pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_turn_position_of_word.append(pos) 
                     pair['comment_content_turn_position'] = pos
@@ -401,19 +383,7 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
                     list_of_utterance_position_of_word.append(pos)
                     pair['comment_content_utterance_position'] = pos
 
-
                 for matched_pattern in re_pattern.finditer(pair['recomment_content']):
-                    
-                    # if 'recomment_content_position' not in pair:
-                    #     pair['recomment_content_position'] = list()
-                    
-                    # pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    # pair['recomment_content_position'].append(pos)
-                    # list_of_turn_position_of_word.append(pos)
-
-                    # pos = get_pattern_position_in_an_utterance(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    # list_of_utterance_position_of_word.append(pos)
-
                     pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
                     list_of_turn_position_of_word.append(pos) 
                     pair['recomment_content_turn_position'] = pos
