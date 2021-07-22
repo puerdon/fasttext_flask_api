@@ -7,6 +7,7 @@ from itertools import repeat, chain
 
 from flask import jsonify
 
+# 用於 PARSE CONSTRUCTION EXTRACTOR QUERY
 def parse_query(string):
     '''
     example input: "整個[傻眼:3]到[不行:3]"
@@ -37,7 +38,7 @@ def parse_query(string):
     return results
 
 
-
+# 用於 PARSE CONSTRUCTION EXTRACTOR QUERY
 def convert_to_regex(obj):
     '''
     example input:
@@ -164,6 +165,8 @@ def get_pattern_position_in_a_string(string, match_obj_start, match_obj_end):
 def get_pattern_position_in_an_utterance(string, match_obj_start, match_obj_end):
     '''
     將一個turn切分成多個utterances後，才去看match_obj的位置
+
+    return 浮點數(0~1)
     '''
     has_only_one_utterance = True
     found = False
@@ -195,69 +198,69 @@ def get_pattern_position_in_an_utterance(string, match_obj_start, match_obj_end)
         return get_pattern_position_in_a_string(new_str, match_obj_start - i, match_obj_end - i)
 
 
-def _get_pattern_position_in_a_string(string, substring):
+# def _get_pattern_position_in_a_string(string, substring):
 
-    l = list()
+#     l = list()
 
-    list_of_words_without_keyword = string.split(substring)
+#     list_of_words_without_keyword = string.split(substring)
 
-    for _i, _w in enumerate(list_of_words_without_keyword):
+#     for _i, _w in enumerate(list_of_words_without_keyword):
 
-        l += list(_w)
+#         l += list(_w)
         
-        if _i == len(list_of_words_without_keyword) - 1:
-            continue
+#         if _i == len(list_of_words_without_keyword) - 1:
+#             continue
         
-        else:
-            l.append(substring)
+#         else:
+#             l.append(substring)
 
 
-    len_of_string = len(l)
+#     len_of_string = len(l)
 
 
-    if len_of_string == 1:
-        return 0
+#     if len_of_string == 1:
+#         return 0
 
-    else:
-        r = list()
+#     else:
+#         r = list()
 
-        for i, w in enumerate(l):
-            if w == substring:
-                r.append((i / len_of_string) * (len_of_string / (len_of_string - 1)))
+#         for i, w in enumerate(l):
+#             if w == substring:
+#                 r.append((i / len_of_string) * (len_of_string / (len_of_string - 1)))
 
-        # print(r)
-        return round(sum(r) / len(r), 2)
+#         # print(r)
+#         return round(sum(r) / len(r), 2)
 
 
-def _get_pattern_position_in_an_utterance(word, content):
+# def _get_pattern_position_in_an_utterance(word, content):
     
-    sentences = re.split('[。 ?？!！]', content)
+#     sentences = re.split('[。 ?？!！]', content)
 
-    for sentence in sentences:
-        if word in sentence:
-            try:
-                yield get_pattern_position_in_a_string(sentence, word)
-            except:
-                # print(sentence)
-                # print(word)
-                pass
+#     for sentence in sentences:
+#         if word in sentence:
+#             try:
+#                 yield get_pattern_position_in_a_string(sentence, word)
+#             except:
+#                 # print(sentence)
+#                 # print(word)
+#                 pass
 
 
-def calculate_word_position_distribution(position_list):
-    
+def calculate_word_position_distribution(position_list, breakpoint_1, breakpoint_2):
+    '''
+    根據輸入的 list of position (list of floats), 以及輸入的手/中中斷點和中/末中斷點
+    計算並輸出三個位置的比例
+    '''
     result = {
         "initial": 0,
         "middle": 0,
         "end": 0
     }
 
-    INITIAL_THRESHOLD = 0.3
-    END_THRESHOLD = 0.7
-
     for position in position_list:
-        if position <= INITIAL_THRESHOLD:
+        if position <= breakpoint_1:
             result['initial'] += 1
-        elif position >= END_THRESHOLD:
+        elif position >= breakpoint_2:
             result['end'] += 1
         else:
             result['middle'] += 1
@@ -283,10 +286,10 @@ def change_tuple_dict_key_to_str_dict_key(freq_list):
 
     return result
 
-def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, regex_enable=False):
+def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, regex_enable=False, breakpoint_1=0.3, breakpoint_2=0.7):
     
-    n_gram_freq_dist_of_utt_containg_keyword = FreqDist()
-    n_gram_freq_dist_of_the_other_utt = FreqDist()
+    # n_gram_freq_dist_of_utt_containg_keyword = FreqDist()
+    # n_gram_freq_dist_of_the_other_utt = FreqDist()
 
     author_counter = Counter()
 
@@ -320,58 +323,37 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
 
             if match_first_turn or match_second_turn:
 
-                for matched_pattern in re_pattern.finditer(pair['comment_content']):
-                    
-                    if 'comment_content_position' not in pair:
-                        pair['comment_content_position'] = list()
-                    
-                    pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    pair['comment_content_position'].append(pos)
-                    list_of_turn_position_of_word.append(pos)
+                try:
+                    for matched_pattern in re_pattern.finditer(pair['comment_content']):
+                        
+                        if 'comment_content_position' not in pair:
+                            pair['comment_content_position'] = list()
+                        
+                        pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
+                        pair['comment_content_position'].append(pos)
+                        list_of_turn_position_of_word.append(pos)
 
-                    pos = get_pattern_position_in_an_utterance(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
-                    list_of_utterance_position_of_word.append(pos)
+                        pos = get_pattern_position_in_an_utterance(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
+                        list_of_utterance_position_of_word.append(pos)
 
 
-                for matched_pattern in re_pattern.finditer(pair['recomment_content']):
-                    
-                    if 'recomment_content_position' not in pair:
-                        pair['recomment_content_position'] = list()
-                    
-                    pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    pair['recomment_content_position'].append(pos)
-                    list_of_turn_position_of_word.append(pos)
+                    for matched_pattern in re_pattern.finditer(pair['recomment_content']):
+                        
+                        if 'recomment_content_position' not in pair:
+                            pair['recomment_content_position'] = list()
+                        
+                        pos = get_pattern_position_in_a_string(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
+                        pair['recomment_content_position'].append(pos)
+                        list_of_turn_position_of_word.append(pos)
 
-                    pos = get_pattern_position_in_an_utterance(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
-                    list_of_utterance_position_of_word.append(pos)
-                  
+                        pos = get_pattern_position_in_an_utterance(pair['recomment_content'], matched_pattern.start(), matched_pattern.end())
+                        list_of_utterance_position_of_word.append(pos)
+
+                except Exception as e:
+                    print(e)
+                    print(pair)
+                      
                 result['data'].append(pair)
-
-
-            # if pattern in pair['comment_content'] or pattern in pair['recomment_content']:
-                
-            #     if pattern in pair['comment_content']:
-            #         pair['comment_content_position'] = get_pattern_position_in_a_string(pair['comment_content'], pattern)
-            #         list_of_turn_position_of_word.append(pair['comment_content_position'])
-
-            #         # 取出關鍵詞在句子中的位置
-            #         for _position in get_pattern_position_in_an_utterance(pattern, pair['comment_content']):
-            #             list_of_utterance_position_of_word.append(_position)
-                    
-
-            #         author_counter[pair['comment_user']] += 1
-                
-            #     if pattern in pair['recomment_content']:
-            #         pair['recomment_content_position'] = get_pattern_position_in_a_string(pair['recomment_content'], pattern)
-            #         list_of_turn_position_of_word.append(pair['recomment_content_position'])
-                    
-            #         # 取出關鍵詞在句子中的位置
-            #         for _position in get_pattern_position_in_an_utterance(pattern, pair['recomment_content']):
-            #             list_of_utterance_position_of_word.append(_position)
-
-            #         author_counter[pair['recomment_user']] += 1
-
-                
                 
 
     # 選兩邊都出現的
@@ -410,24 +392,7 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
                     list_of_utterance_position_of_word.append(pos)
 
                 result['data'].append(pair)
-        # for pair in corpus:
 
-        #     if pattern in pair['comment_content'] and pattern in pair['recomment_content']:
-        #         pair['comment_content_position'] = get_pattern_position_in_a_string(pair['comment_content'], pattern)
-        #         pair['recomment_content_position'] = get_pattern_position_in_a_string(pair['recomment_content'], pattern)
-                
-        #         list_of_turn_position_of_word.append(pair['comment_content_position'])
-        #         list_of_turn_position_of_word.append(pair['recomment_content_position'])
-                
-        #         # 取出關鍵詞在句子中的位置
-        #         for _position in get_pattern_position_in_an_utterance(pattern, pair['comment_content']):
-        #             list_of_utterance_position_of_word.append(_position)
-        #         for _position in get_pattern_position_in_an_utterance(pattern, pair['recomment_content']):
-        #             list_of_utterance_position_of_word.append(_position)
-
-        #         result['data'].append(pair)
-        #         author_counter[pair['comment_user']] += 1
-        #         author_counter[pair['recomment_user']] += 1
 
     # 選回文 or 回回文的
     else:
@@ -445,28 +410,30 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
 
                     pos = get_pattern_position_in_a_string(utterance, matched_pattern.start(), matched_pattern.end())
                     list_of_turn_position_of_word.append(pos) 
-                    pair[key[which_side] + '_content_position'] = pos
+                    pair[key[which_side] + '_content_turn_position'] = pos
 
                     pos = get_pattern_position_in_an_utterance(utterance, matched_pattern.start(), matched_pattern.end())
                     list_of_utterance_position_of_word.append(pos)
+                    pair[key[which_side] + '_content_utterance_position'] = pos
+
 
                 result['data'].append(pair)
                 author_counter[pair[key[which_side] + '_user']] += 1
 
                 # 計算 n-gram
-                n_gram_freq_dist_of_utt_containg_keyword = generate_n_gram_freq_dist(utterance, n_gram_freq_dist_of_utt_containg_keyword, 2)
-                n_gram_freq_dist_of_the_other_utt = generate_n_gram_freq_dist(other_side_utterance, n_gram_freq_dist_of_the_other_utt, 2)
+                # n_gram_freq_dist_of_utt_containg_keyword = generate_n_gram_freq_dist(utterance, n_gram_freq_dist_of_utt_containg_keyword, 2)
+                # n_gram_freq_dist_of_the_other_utt = generate_n_gram_freq_dist(other_side_utterance, n_gram_freq_dist_of_the_other_utt, 2)
 
-        result['statistics']['word_position'] = round(sum(list_of_turn_position_of_word) / len(list_of_turn_position_of_word), 2)
+        # result['statistics']['word_position'] = round(sum(list_of_turn_position_of_word) / len(list_of_turn_position_of_word), 2)
         
-        result['statistics']['n_gram_freq_dist_of_utt_containg_keyword'] = change_tuple_dict_key_to_str_dict_key(n_gram_freq_dist_of_utt_containg_keyword.most_common(30))
-        result['statistics']['n_gram_freq_dist_of_the_other_utt'] = change_tuple_dict_key_to_str_dict_key(n_gram_freq_dist_of_the_other_utt.most_common(30))
+        # result['statistics']['n_gram_freq_dist_of_utt_containg_keyword'] = change_tuple_dict_key_to_str_dict_key(n_gram_freq_dist_of_utt_containg_keyword.most_common(30))
+        # result['statistics']['n_gram_freq_dist_of_the_other_utt'] = change_tuple_dict_key_to_str_dict_key(n_gram_freq_dist_of_the_other_utt.most_common(30))
 
 
-    result['statistics']['total'] = sum(author_counter.values())
-    result['statistics']['author_type'] = len(author_counter.keys())
-    result['statistics']['turn_position_distribution'] = calculate_word_position_distribution(list_of_turn_position_of_word)
-    result['statistics']['utterance_position_distribution'] = calculate_word_position_distribution(list_of_utterance_position_of_word)
+    # result['statistics']['total'] = sum(author_counter.values())
+    # result['statistics']['author_type'] = len(author_counter.keys())
+    result['statistics']['turn_position_distribution'] = calculate_word_position_distribution(list_of_turn_position_of_word, breakpoint_1, breakpoint_2)
+    result['statistics']['utterance_position_distribution'] = calculate_word_position_distribution(list_of_utterance_position_of_word, breakpoint_1, breakpoint_2)
 
     if result['statistics']['total'] == 0:
         result['statistics']['author_diversity'] = 0

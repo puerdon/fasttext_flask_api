@@ -42,11 +42,11 @@ def _join(candidates, parsed_query):
                 "type": "slot",
                 "word": candidates[counter]
             })
-            counter = counter + 1;
+            counter = counter + 1
     
-    return results;
+    return results
 
-
+# 用於比較 construction target slots 與其他 variable slots 的相似性
 def _similarity(content, parsed_query):
     print('content')
     print(content)
@@ -69,25 +69,30 @@ def _similarity(content, parsed_query):
     return jsonify({'status': 'success', 'sorted_candidates': result})
 
 
-@app.route('/similarity')
-def similarity():
-    content = request.json
-    # 傳來的 json 格式如下:
-    # 整個 [無聊] 到 [不行]
-    # {target: [無聊, 不行], candidates: [[嗨, 不行], [傻眼, 想死], ...]}
+# @app.route('/similarity')
+# def similarity():
+#     content = request.json
+#     # 傳來的 json 格式如下:
+#     # 整個 [無聊] 到 [不行]
+#     # {target: [無聊, 不行], candidates: [[嗨, 不行], [傻眼, 想死], ...]}
 
-    return _similarity(content)
+#     return _similarity(content)
 
+# 搜尋discourse positional 的 API 接口
 @app.route('/query')
 def query():
     query_pattern = request.args.get("pattern")
     comment_type = request.args.get("comment_type", None)
     which_side = request.args.get("which_side")
-    regex_enable = True if request.args.get("regex_enable") == 'true' else False
+    regex_enable = True if request.args.get("regex_enable") == "true" else False
+    breakpoint_1 = request.args.get("breakpoint_1", 0.3, type=float)
+    breakpoint_2 = request.args.get("breakpoint_2", 0.7, type=float)
 
-    return query_pattern_from_side(query_pattern, which_side, corpus, comment_type, regex_enable)
+
+    return query_pattern_from_side(query_pattern, which_side, corpus, comment_type, regex_enable, breakpoint_1, breakpoint_2)
 
 
+# 搜尋 construction 的 API 接口
 @app.route('/construction_extractor')
 def construction_extractor():
     query_pattern = request.args.get("pattern")
@@ -127,6 +132,7 @@ def construction_extractor():
     return _similarity({'target': target, 'candidates': list(candidates)}, parsed_query)
 
 
+# 搜尋 construction 後，取出特定 concordance hits 的 API 接口
 @app.route('/get_sentence')
 def get_sentence():
     query_pattern = request.args.get("pattern")
