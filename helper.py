@@ -313,6 +313,8 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
     list_of_turn_position_of_word = list()
     list_of_utterance_position_of_word = list()
 
+    print(which_side)
+
     # 選任意一邊出現的
     if which_side == 'any':
         print("any")
