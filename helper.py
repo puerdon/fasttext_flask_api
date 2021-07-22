@@ -331,7 +331,7 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
                     if 'comment_content_turn_position' not in pair:
                         pair['comment_content_turn_position'] = list()
 
-                    if 'comment_content_turn_position' not in pair:
+                    if 'comment_content_utterance_position' not in pair:
                         pair['comment_content_utterance_position'] = list()
 
                     pos = get_pattern_position_in_a_string(pair['comment_content'], matched_pattern.start(), matched_pattern.end())
