@@ -315,7 +315,7 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
 
     # 選任意一邊出現的
     if which_side == 'any':
-
+        print("any")
         for pair in corpus:
 
             match_first_turn = re_pattern.search(pair['comment_content'])
