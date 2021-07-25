@@ -20,7 +20,7 @@ sys.path.insert(0, '/usr/src')
 from app.helper import *
 # 載入模型 (大約要 1 分鐘)
 model = load_facebook_model('fasttext-cc.zh.300.bin')
-from .helper import *
+# from .helper import *
 
 print(sys.path)
 
