@@ -1,6 +1,7 @@
 from nltk import FreqDist
 from nltk.util import ngrams
 
+import copy
 import re
 from collections import Counter
 from itertools import repeat, chain
@@ -288,6 +289,8 @@ def change_tuple_dict_key_to_str_dict_key(freq_list):
 
 def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, regex_enable=False, breakpoint_1=0.3, breakpoint_2=0.7):
     
+    corpus = copy.deepcopy(corpus)
+
     # n_gram_freq_dist_of_utt_containg_keyword = FreqDist()
     # n_gram_freq_dist_of_the_other_utt = FreqDist()
 
@@ -431,6 +434,7 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
                     list_of_turn_position_of_word.append(pos) 
                     pair[key[which_side] + '_content_turn_position'].append(pos)
 
+
                     pos = get_pattern_position_in_an_utterance(utterance, matched_pattern.start(), matched_pattern.end())
                     list_of_utterance_position_of_word.append(pos)
                     pair[key[which_side] + '_content_utterance_position'].append(pos)
@@ -459,9 +463,11 @@ def query_pattern_from_side(pattern, which_side, corpus, comment_type=None, rege
 
     # result['statistics']['total'] = sum(author_counter.values())
     # result['statistics']['author_type'] = len(author_counter.keys())
+    print(list_of_turn_position_of_word)
+    print(list_of_utterance_position_of_word,)
     result['statistics']['turn_position_distribution'] = calculate_word_position_distribution(list_of_turn_position_of_word, breakpoint_1, breakpoint_2)
     result['statistics']['utterance_position_distribution'] = calculate_word_position_distribution(list_of_utterance_position_of_word, breakpoint_1, breakpoint_2)
-
+    print(result['statistics'])
     if result['statistics']['total'] == 0:
         result['statistics']['author_diversity'] = 0
     else:

@@ -9,12 +9,18 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 # from gensim.models.wrappers import FastText
 # from sklearn.metrics.pairwise import cosine_similarity
-from gensim.models.fasttext import load_facebook_model
+
+
 from nltk import FreqDist
 from nltk.util import ngrams
 
+# 發布後要記得解註解
+from gensim.models.fasttext import load_facebook_model
 sys.path.insert(0, '/usr/src')
 from app.helper import *
+# 載入模型 (大約要 1 分鐘)
+model = load_facebook_model('fasttext-cc.zh.300.bin')
+from .helper import *
 
 print(sys.path)
 
@@ -23,9 +29,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 CORS(app)
 
-# 載入模型 (大約要 1 分鐘)
-model = load_facebook_model('fasttext-cc.zh.300.bin')
-# model = None
+
 
 with open("womentalk_2019_pair.pickle", "rb") as f:
     corpus = pickle.load(f)
